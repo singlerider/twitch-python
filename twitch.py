@@ -4,31 +4,31 @@ import json
 
 class Twitch:
 
-    def __init__(self, channel, user):
+    def __init__(self, channel, user):  # require these two for instantiation
         self.channel = channel
         self.user = user
 
+    # this endpoint fails often
     def users(self):
         n = 0
-        # this endpoint fails often
+        dummy = {  # in case the endpoint fails (can be as often as 1:8)
+            "_links": {}, "chatters_count": 0, "chatters": {
+                "staff": [], "admin": [], "global_mods": [],
+                "viewers": [], "moderators": []}}
         while n < 3:
-            dummy = {
-                "_links": {}, "chatters_count": 0, "chatters": {
-                    "staff": [], "admin": [], "global_mods": [],
-                    "viewers": [], "moderators": []}}
             try:
                 url = "https://tmi.twitch.tv/group/user/" + self.channel \
                     + "/chatters"
                 resp = requests.get(url=url)
                 data = json.loads(resp.content)
-                return data
-            except ValueError:
-                n += 1
-                if n < 3:
-                    continue
-            except:
+                return data  # in the same format as dummy
+            except ValueError:  # "No JSON object could be decoded"
+                n += 1  # make sure n increases value by one on each loop
+                if n < 3:  # if it's not, it will exit the loop
+                    continue  # go back to the beginning of the loop
+            except:  # in case of an unexpected error
                 return dummy
-        return dummy
+        return dummy  # will only happen after three ValueErrors in a row
 
     def follower_status(self):
         url = "https://api.twitch.tv/kraken/users/" + self.user \
@@ -66,7 +66,8 @@ class Twitch:
         data = json.loads(resp.content)
         return data
 
-    def authenticate(self, client_id, client_secret, redirect_uri, scopes, token):
+    def authenticate(
+            self, client_id, client_secret, redirect_uri, scopes, token):
         # scopes are space separated
         user_url = "https://api.twitch.tv/kraken/oauth2/authorize" + \
             "?response_type=code" + \
