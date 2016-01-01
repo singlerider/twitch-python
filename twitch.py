@@ -1,5 +1,6 @@
 import requests
 import json
+from settings import client_id, client_secret, redirect_uri, scopes, token
 
 
 class Twitch:
@@ -27,8 +28,8 @@ class Twitch:
                 if n < 3:  # if it's not, it will exit the loop
                     continue  # go back to the beginning of the loop
             except:  # in case of an unexpected error
-                return dummy
-        return dummy  # will only happen after three ValueErrors in a row
+                return dummy, []
+        return dummy, []  # will only happen after three ValueErrors in a row
 
     def follower_status(self):
         url = "https://api.twitch.tv/kraken/users/" + self.user \
@@ -67,7 +68,8 @@ class Twitch:
         return data
 
     def authenticate(
-            self, client_id, client_secret, redirect_uri, scopes, token):
+            self, client_id=client_id, client_secret=client_secret,
+            redirect_uri=redirect_uri, scopes=scoped, token=token):
         # scopes are space separated
         user_url = "https://api.twitch.tv/kraken/oauth2/authorize" + \
             "?response_type=code" + \
