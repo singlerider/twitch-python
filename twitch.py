@@ -29,7 +29,11 @@ class Twitch:
                     + "/chatters"
                 resp = requests.get(url=url)
                 data = json.loads(resp.content)
-                return data  # in the same format as dummy
+                all_users = []
+                for user_type in data['chatters']:
+                    [all_users.append(str(user)) for user in data[
+                        "chatters"][user_type]]
+                return data, all_users # in the same format as dummy
             except ValueError:  # "No JSON object could be decoded"
                 n += 1  # make sure n increases value by one on each loop
                 if n < 3:  # if it's not, it will exit the loop
